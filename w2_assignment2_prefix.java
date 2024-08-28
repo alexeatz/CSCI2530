@@ -39,3 +39,4 @@ public static void main(String[] args){
 
 	}
 }
+//faster method would be using a while loop. instead of 2 fors
