@@ -1,0 +1,284 @@
+package bankAccount;
+import java.util.Scanner;
+
+public class BankAccountDemo {
+
+    private static BankAccount[] account = new BankAccount[100];
+
+    public static void main(String[] args) 
+    {
+        int defaultState = 0;
+        Scanner keyboard = new Scanner(System.in);
+
+        while (defaultState != -1) {
+            System.out.println("Please Choose the number of the option from below: ");
+            System.out.printf("%-10s%-10s%-10s%-10s%-10s%-10s%-10s\n", "1.Create Account ", "2.Check Balance ", "3.Withdraw ",
+            		"4.Deposit ", "\n5.Transfer ", "6.Update Interest ", 
+            		"7.Check All Account Info ", "\nTo Exit Enter -1");
+            // update above for formulated print
+            System.out.println("To Exit Bank Enter -1");
+            int option = keyboard.nextInt();
+            if (option == -1) {
+                defaultState = option;
+            }
+
+            // Switch statement to call methods
+            switch (option) {
+                case 1: {
+                    newAccount(keyboard);
+                    break;
+                }
+                case 2: {
+                    printInfo(keyboard);
+                    break;
+                }
+                case 3: {
+                    withdrawOption(keyboard);
+                    break;
+                }
+                case 4:
+                {
+                	depositOption(keyboard);
+                	break;
+                }
+                case 5:
+                {
+                	transferOption(keyboard);
+                	break;
+                }
+                case 6: 
+                {
+                	updateInt(keyboard);
+                	break;
+                }
+                case 7:
+                {
+                	printAll(keyboard);
+                	break;
+                }
+                default:
+                    System.out.println("Invalid option. Please try again.");
+            }
+        }
+        keyboard.close();
+    }
+	public static void newAccount(Scanner keyboard)
+	{
+		int numAccounts = BankAccount.getNumAccounts();
+		
+		if(numAccounts >= 100)
+		{
+			System.out.println("Too Full!");
+			return;
+		}
+		
+		else
+		{
+			System.out.println("Enter name: ");
+			keyboard.nextLine();
+			String name = keyboard.nextLine();
+			
+			
+			System.out.println("Enter ID:");
+			String id = keyboard.nextLine();
+			
+			
+			System.out.println("Enter initial balance: ");
+			double balance = keyboard.nextDouble();
+			
+			account[numAccounts] = new BankAccount(name,id, balance, .035);
+			System.out.println("Accont for " + account[numAccounts].getName() + " with ID number " + account[numAccounts].getID() + " created!");
+			System.out.println("Current balance: " + account[numAccounts].getBal());
+			return;
+		}
+		
+	
+	}
+	
+	public static void printInfo(Scanner keyboard)
+	{
+		System.out.println("Please enter ID number of account: ");
+		String id = keyboard.next();
+		if(found(id) == -1)
+		{
+			System.out.println("ID not found!");
+			return;
+		}
+		
+		for(int i = 0; i < 100; i++)
+		{
+			if(account[i].getID().equals(id) && account[i] != null)
+			{
+				System.out.println("Account info: ");
+				System.out.println("Name: " + account[i].getName());
+				System.out.println("ID: " + account[i].getID());
+				System.out.println("Balance: $" +account[i].getBal());
+				System.out.println("Bank's interest rate: " + account[i].getInt());
+				return;
+			}
+		}
+	}
+		
+	public static void withdrawOption(Scanner keyboard)
+	{
+		System.out.println("Please enter ID number of account you wish to withdraw: ");
+		String id = keyboard.next();
+		System.out.println();
+		if(found(id) == -1)
+		{
+			System.out.println("ID not found!");
+			return;
+		}
+		
+		for(int i = 0; i < 100; i++)
+		{
+			if(account[i].getID().equals(id) && account[i] != null)
+			{
+				System.out.println("How much would you like to withdraw, " + account[i].getName() + " ");
+				Double withdrawAmount = keyboard.nextDouble();
+				account[i].withdraw(withdrawAmount);
+				break;
+			}
+		}
+		
+	}
+	
+	public static void depositOption(Scanner keyboard)
+	{
+		System.out.println("Please enter ID number of account you wish to deposit: ");
+		String id = keyboard.next();
+		System.out.println();
+		if(found(id) == -1)
+		{
+			System.out.println("ID not found!");
+			return;
+		}
+		for(int i = 0; i < 100; i++)
+		{
+			if(account[i].getID().equals(id) && account[i] != null)
+			{
+				System.out.println("How much would you like to deposit, " + account[i].getName() + " ");
+				Double depositAmount = keyboard.nextDouble();
+				account[i].deposit(depositAmount);
+				break;
+			}
+		}
+	}
+	
+	public static void transferOption(Scanner keyboard)
+	{
+		System.out.println("Please enter ID number of account you would like to transfer from: ");
+		String idFrom = keyboard.next();
+		if(found(idFrom) == -1)
+		{
+			System.out.println("ID not found!");
+			return;
+		}
+		
+		for(int i = 0; i < 100; i++)
+		{
+			while(account[i] != null) 
+			{
+				if(account[i].getID().equals(idFrom) && account[i] != null)
+				{
+					System.out.println("How much would you like to transfer from " + account[i].getName()+"'s account?");
+					double fromBal = keyboard.nextDouble();
+					
+					
+					if(account[i].getBal() < fromBal)
+					{
+						System.out.println("Wop Wop, you're too poor");
+						return;
+					}
+					
+					System.out.println("Please enter ID number of account you wish to transfer funds to: ");
+					String idTo = keyboard.next();
+					if(found(idTo) == -1)
+					{
+						System.out.println("ID not found!");
+						return;
+					}
+					
+					
+					for(int j = 0; j < 100; j++)
+					{
+						if(account[j].getID().equals(idTo) && account[j] != null)
+						{
+							account[i].withdraw(fromBal);
+							account[j].deposit(fromBal);
+							System.out.println("Transfer complete!");
+							return;
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	
+	public static void updateInt(Scanner keyboard)
+	{
+		System.out.println("Enter ID for account you wish to update interest rate: ");
+		String id = keyboard.next();
+		if(found(id) == -1)
+		{
+			System.out.println("ID not found!");
+			return;
+		}
+		BankAccount updated = null;
+		for(int i = 0; i < 100; i++)
+		{
+			if(account[i].getID().equals(id) && account[i] != null)
+			{
+				updated = account[i];
+				break;
+			}
+			else
+			{
+				System.out.println("Id invalid");
+				return;
+			}
+		}
+		
+		System.out.println("Set new interest rate: ");
+		double intRate = keyboard.nextDouble();
+		
+		updated.setInt(intRate);
+		System.out.println("The  new rate for "+ updated.getName() + "'s account is " + updated.getInt() + "%.");
+		return;
+	}
+	
+	public static void printAll(Scanner keyboard)
+	{
+		double total = 0;
+		System.out.printf("%-5s %-15s %-10s %-10s", "ID", "Name", "Balance", "Interest Rate");
+		System.out.println();
+		for(int i = 0; i < 100; i++)
+		{
+			if (account[i] != null)
+			{
+				System.out.printf("%-5s %-15s %-10.2f %10.2f", account[i].getID(), account[i].getName(), account[i].getBal(), account[i].getInt());
+				total += account[i].getBal();
+				System.out.println();
+			}
+		}
+		System.out.println("Total Balance All Accounts: $" + total);
+		System.out.println();
+	}
+	
+	public static int found(String id)
+	{
+		for(int i = 0; i < 100; i++)
+		{
+			if(account[i] != null && account[i].getID().equals(id))
+			{
+				return i;
+			}
+		}
+		return -1;	
+	}
+	
+}
+	
+
+
